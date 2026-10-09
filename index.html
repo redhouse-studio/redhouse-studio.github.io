@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Planning Redhouse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the studio photo fills the screen; a smoked-glass booth frame holds an Apple-style week grid. Single dark look, like the room at night. */
+:root{
+  --ink:#1a0a07; --glass:rgba(28,11,8,.72); --glass-2:rgba(46,18,12,.86);
+  --wood:#e9b27a; --led:#ffd9a0; --text:#fbeee2; --muted:#c9a893;
+  --line:rgba(255,214,170,.12); --line-strong:rgba(255,214,170,.26); --danger:#ff8a7a;
+  --font-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --font-body:"Figtree",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --hour:52px; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:var(--ink)}
+body{background:var(--ink) url("studio.jpg") center 40%/cover fixed no-repeat;color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 35%,rgba(26,10,7,.35),rgba(26,10,7,.86) 75%)}
+[hidden]{display:none!important}
+img{max-width:100%}
+.wrap{position:relative;height:100%;display:flex;flex-direction:column;gap:12px;padding-inline:16px;padding-block:14px;max-width:1280px;margin:0 auto}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.55;cursor:default}
+:focus-visible{outline:2px solid var(--led);outline-offset:2px}
+
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.brand{display:flex;flex-direction:column;margin-right:auto;min-width:0}
+.brand h1{font-family:var(--font-display);font-weight:700;font-size:clamp(22px,3.2vw,30px);letter-spacing:-.01em;margin:0;line-height:1.05;text-shadow:0 0 18px rgba(255,190,120,.45)}
+.brand .range{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-top:4px}
+.ctrls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{background:var(--glass);border:1px solid var(--line-strong);border-radius:10px;padding:7px 12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.btn:hover:not(:disabled){border-color:var(--led)}
+.btn.primary{background:var(--wood);color:var(--ink);border-color:var(--wood);font-weight:600}
+.btn.primary:hover:not(:disabled){background:var(--led)}
+.btn.plain{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
+.btn.danger{color:var(--danger);border-color:rgba(255,138,122,.4)}
+.link{background:none;border:0;padding:0;color:var(--led);text-decoration:underline;text-underline-offset:3px}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:10px;overflow:hidden;background:var(--glass);backdrop-filter:blur(10px)}
+.seg button{background:none;border:0;padding:7px 12px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:rgba(255,217,160,.16);color:var(--text)}
+.me{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--glass);border:1px solid var(--line)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;box-shadow:0 0 8px currentColor}
+.badge{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:var(--danger);color:var(--ink);font-size:11px;font-weight:700;margin-left:6px;padding:0 4px}
+
+.booth{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;border-radius:14px;
+  background:var(--glass);backdrop-filter:blur(14px) saturate(1.15);-webkit-backdrop-filter:blur(14px) saturate(1.15);
+  border:1px solid var(--line-strong);box-shadow:inset 0 1px 0 rgba(255,217,160,.55),0 0 0 1px rgba(0,0,0,.3),0 0 40px -8px rgba(255,170,90,.35);overflow:hidden}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .you{color:var(--text);font-weight:600}
+.legend .tip{margin-left:auto;font-size:12px}
+.cal{flex:1;min-height:0;overflow:auto;position:relative}
+.cal-head,.cal-body{display:grid;grid-template-columns:56px repeat(var(--days),minmax(0,1fr))}
+.cal-head{position:sticky;top:0;z-index:5;background:var(--glass-2);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-strong)}
+.dh{padding:8px 6px;text-align:center;border-left:1px solid var(--line);min-width:0}
+.dh .dn{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.dh .dd{font-family:var(--font-display);font-size:22px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
+.dh.today .dd{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--wood);color:var(--ink)}
+.gut div{height:var(--hour);font-family:var(--font-mono);font-size:10.5px;color:var(--muted);text-align:right;padding-right:8px;transform:translateY(-7px);font-variant-numeric:tabular-nums}
+.gut div:first-child{visibility:hidden}
+.col{position:relative;border-left:1px solid var(--line);height:calc(var(--hour)*24);min-width:0;
+  background-image:linear-gradient(to bottom,var(--line) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,214,170,.05) 1px,transparent 1px);
+  background-size:100% var(--hour),100% calc(var(--hour)/2);background-position:0 0,0 calc(var(--hour)/2);cursor:crosshair;user-select:none;-webkit-user-select:none}
+.col.today{background-color:rgba(255,217,160,.04)}
+.now{position:absolute;left:-1px;right:0;height:2px;background:var(--danger);z-index:3;pointer-events:none}
+.now::before{content:"";position:absolute;left:-5px;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--danger)}
+.ev{position:absolute;left:3px;right:3px;border-radius:7px;padding:3px 7px;overflow:hidden;z-index:2;border:0;
+  background:color-mix(in srgb,var(--c) 82%,transparent);color:#1a0a07;border-left:3px solid color-mix(in srgb,var(--c) 60%,#000);
+  box-shadow:0 2px 10px -2px rgba(0,0,0,.5);font-size:12px;line-height:1.25;text-align:left;cursor:pointer}
+.ev:hover{filter:brightness(1.08)}
+.ev .t{font-family:var(--font-mono);font-size:10.5px;opacity:.8;font-variant-numeric:tabular-nums}
+.ev .m{font-weight:600;overflow-wrap:anywhere}
+.ev .o{opacity:.75;font-size:11px}
+.ev.mine{box-shadow:0 0 0 1.5px rgba(255,255,255,.7),0 2px 10px -2px rgba(0,0,0,.5);cursor:grab}
+.ev.mine::after{content:"";position:absolute;left:0;right:0;bottom:0;height:7px;cursor:ns-resize}
+.ev.mine::before{content:"";position:absolute;left:50%;bottom:2px;width:18px;height:2px;margin-left:-9px;border-radius:2px;background:rgba(26,10,7,.35)}
+body.alt .ev,body.alt .ev::after{cursor:copy}
+.draft{position:absolute;left:3px;right:3px;border-radius:7px;z-index:4;pointer-events:none;
+  background:color-mix(in srgb,var(--c) 45%,transparent);border:1.5px dashed var(--c);font-family:var(--font-mono);font-size:11px;padding:3px 6px;color:var(--text)}
+.draft.bad{--c:var(--danger)}
+body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit-user-select:none}
+body.resizing,body.resizing *{cursor:ns-resize!important}
+body.copying,body.copying *{cursor:copy!important}
+
+.gate{flex:1;display:grid;place-items:center;min-height:0;overflow:auto;padding-block:20px}
+.card{width:min(460px,100%);background:var(--glass-2);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line-strong);border-radius:16px;padding:24px;
+  box-shadow:inset 0 1px 0 rgba(255,217,160,.5),0 20px 60px -20px rgba(0,0,0,.7)}
+.card h2{font-family:var(--font-display);font-size:24px;margin:0 0 6px;text-wrap:balance}
+.card p{color:var(--muted);margin:0 0 14px}
+.card form{display:block}
+label.l{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:12px 0 6px}
+input[type=text],input[type=email],input[type=password],input[type=date],input[type=time],textarea{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--line-strong);border-radius:9px;padding:9px 11px}
+textarea{resize:vertical;min-height:60px}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid transparent;background:var(--c);position:relative;padding:0}
+.sw[aria-checked="true"]{border-color:var(--text);box-shadow:0 0 0 2px var(--ink) inset}
+.sw.taken::after{content:"";position:absolute;inset:-2px;border-radius:50%;background:repeating-linear-gradient(45deg,transparent 0 4px,rgba(26,10,7,.65) 4px 6px)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.row>*{flex:1 1 auto}
+.times{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px}
+@media (max-width:420px){.times{grid-template-columns:1fr 1fr}.times>:first-child{grid-column:1/-1}}
+.err{color:var(--danger);font-size:13px;min-height:1.2em;margin-top:10px}
+.ok{color:#a7f3a0;font-size:13px;margin-top:10px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.switch{margin-top:16px;font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px}
+
+.scrim{position:fixed;inset:0;background:rgba(10,4,3,.55);z-index:20;display:grid;place-items:center;padding:16px;overflow:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);z-index:21;background:var(--glass-2);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-left:1px solid var(--line-strong);
+  padding:calc(env(safe-area-inset-top,0px) + 18px) 18px 18px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.drawer h2{font-family:var(--font-display);margin:0;font-size:22px}
+.drawer h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:8px 0 0;font-weight:600}
+.person{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.person .top{display:flex;gap:10px;align-items:center;min-width:0}
+.person .n{font-weight:600}
+.person .e{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);overflow-wrap:anywhere}
+.person .note{font-size:13px;color:var(--muted);font-style:italic}
+.person .acts{display:flex;gap:8px;flex-wrap:wrap}
+.empty{color:var(--muted);font-size:14px;padding:6px 0}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);z-index:30;background:var(--wood);color:var(--ink);padding:9px 16px;border-radius:10px;font-weight:600;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);max-width:calc(100% - 32px)}
+@media (max-width:700px){ .hide-sm{display:none} .legend .tip{display:none} }
+@media (prefers-reduced-motion:no-preference){ .ev,.btn{transition:filter .15s,border-color .15s,background .15s} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><h1>Planning Redhouse</h1><div class="range" id="range">Chargement…</div></div>
+    <div class="ctrls" id="ctrls" hidden>
+      <button class="btn" id="prev" aria-label="Période précédente">‹</button>
+      <button class="btn" id="today">Aujourd’hui</button>
+      <button class="btn" id="next" aria-label="Période suivante">›</button>
+      <div class="seg" role="group" aria-label="Vue">
+        <button id="v-day" aria-pressed="false">Jour</button>
+        <button id="v-week" aria-pressed="true">Semaine</button>
+      </div>
+      <button class="btn primary" id="new">+ Créneau</button>
+      <button class="btn" id="admin" hidden>Participants<span class="badge" id="pend" hidden>0</span></button>
+      <div class="me" id="mechip"><span class="dot" id="medot"></span><span id="mename" class="hide-sm"></span></div>
+      <button class="btn plain" id="logout">Déconnexion</button>
+    </div>
+  </header>
+
+  <section class="gate" id="gate"><div class="card"><h2>Ouverture du studio…</h2><p>Connexion au planning.</p></div></section>
+
+  <section class="booth" id="booth" hidden>
+    <div class="legend" id="legend"></div>
+    <div class="cal" id="cal">
+      <div class="cal-head" id="calhead"></div>
+      <div class="cal-body" id="calbody"></div>
+    </div>
+  </section>
+</div>
+<div id="layer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+(() => {
+const PALETTE = ["#5ee6c6","#7cc4ff","#c4f06a","#ffd166","#c9a6ff","#ff9ccf","#9ae0ff","#ffb36b","#a7f3a0","#f2f2f2","#8fa8ff","#ff8f6b"];
+const SNAP = 15;
+const H = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--hour")) || 52;
+const $ = s => document.getElementById(s);
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+const pad = n => String(n).padStart(2,"0");
+const hm = d => pad(d.getHours()) + ":" + pad(d.getMinutes());
+const dayKey = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const startOfDay = d => { const x = new Date(d); x.setHours(0,0,0,0); return x; };
+const addDays = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+const mondayOf = d => { const x = startOfDay(d); return addDays(x, -((x.getDay()+6)%7)); };
+const fmtDay = new Intl.DateTimeFormat("fr-FR",{weekday:"short"});
+const fmtLong = new Intl.DateTimeFormat("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+const fmtRange = new Intl.DateTimeFormat("fr-FR",{day:"numeric",month:"short"});
+const pageUrl = location.origin + location.pathname;
+
+const S = { sb:null, session:null, me:null, profiles:{}, slots:[], admin:{users:[], all:[]},
+  view:(innerWidth < 700 ? "day" : "week"), anchor:startOfDay(new Date()), scrolled:false,
+  dragging:false, pendingRender:false, chan:null, poll:null, recovery:false };
+
+function toast(msg){ document.querySelectorAll(".toast").forEach(t=>t.remove()); const t = el("div","toast",msg); document.body.appendChild(t); setTimeout(()=>t.remove(),3200); }
+function gate(build){ closeLayer(); $("gate").hidden=false; $("booth").hidden=true; $("ctrls").hidden=true; const g=$("gate"); g.replaceChildren(); const c=el("div","card"); build(c); g.appendChild(c); const f=c.querySelector("input"); if (f) f.focus(); }
+function field(label, type, id, attrs={}){ const w=el("div"); const i=el(type==="textarea"?"textarea":"input"); if (type!=="textarea") i.type=type; i.id=id; Object.assign(i, attrs); const l=el("label","l",label); l.htmlFor=id; w.append(l,i); return [w,i]; }
+const nameOf = id => (S.profiles[id] && S.profiles[id].display_name) || "Participant";
+const colorOf = id => (S.profiles[id] && S.profiles[id].color) || "#c9a893";
+
+function dbErr(e){
+  const c = e && e.code, m = (e && e.message) || "";
+  if (c === "23P01") return "Ce créneau chevauche celui de quelqu’un d’autre.";
+  if (c === "42501" || /row-level security/i.test(m)) return "Action non autorisée avec ton accès actuel.";
+  if (c === "23514") return "Créneau invalide : vérifie les heures et le motif (24 h maximum).";
+  if (/fetch|network/i.test(m)) return "Pas de connexion au serveur. Vérifie ta connexion internet.";
+  return "Action impossible : " + (m || "erreur inconnue");
+}
+function authErr(e){
+  const m = (e && e.message) || "";
+  if (/invalid login credentials/i.test(m)) return "E-mail ou mot de passe incorrect.";
+  if (/email not confirmed/i.test(m)) return "Confirme d’abord ton adresse : clique sur le lien reçu par e-mail.";
+  if (/already registered|already been registered/i.test(m)) return "Un compte existe déjà avec cette adresse. Connecte-toi.";
+  if (/password should be at least|weak/i.test(m)) return "Mot de passe trop faible : 8 caractères minimum.";
+  if (/rate limit|too many/i.test(m)) return "Trop de tentatives. Réessaie dans quelques minutes.";
+  if (/fetch|network/i.test(m)) return "Pas de connexion au serveur. Vérifie ta connexion internet.";
+  return m || "Une erreur est survenue.";
+}
+
+/* ---------- Boot ---------- */
+function boot(){
+  const cfg = window.REDHOUSE_CONFIG || {};
+  if (!window.supabase || !cfg.url || !cfg.anonKey || /TON-PROJET|TA-CLE/.test(cfg.url + cfg.anonKey)){
+    gate(c=>{ c.append(el("h2",null,"Configuration à terminer"), el("p",null,"Renseigne l’adresse et la clé publique de ta base Supabase dans le fichier config.js, puis recharge cette page. Le fichier README.md explique chaque étape.")); });
+    $("range").textContent = "Installation"; return;
+  }
+  S.sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+  S.sb.auth.onAuthStateChange((event, session)=>{
+    // never await Supabase calls inside this callback
+    setTimeout(()=>onAuth(event, session), 0);
+  });
+}
+async function onAuth(event, session){
+  if (event === "PASSWORD_RECOVERY"){ S.recovery = true; S.session = session; gate(newPasswordCard); return; }
+  if (S.recovery && event !== "SIGNED_OUT") return;
+  const prev = S.session && S.session.user.id;
+  S.session = session;
+  if (!session){ teardown(); gate(loginCard); $("range").textContent = "Connexion"; return; }
+  if (event === "TOKEN_REFRESHED" && prev === session.user.id) return;
+  await loadMe();
+}
+function teardown(){ if (S.chan){ S.sb.removeChannel(S.chan); S.chan=null; } clearInterval(S.poll); S.poll=null; S.me=null; S.profiles={}; S.slots=[]; }
+
+async function loadMe(){
+  const uid = S.session.user.id;
+  let { data, error } = await S.sb.from("profiles").select("*").eq("id", uid).maybeSingle();
+  if (!data && !error){ await new Promise(r=>setTimeout(r,800)); ({ data, error } = await S.sb.from("profiles").select("*").eq("id", uid).maybeSingle()); }
+  if (error){ gate(c=>{ c.append(el("h2",null,"Connexion au planning impossible"), el("p",null,dbErr(error))); c.append(logoutRow()); }); return; }
+  if (!data){ gate(c=>{ c.append(el("h2",null,"Profil introuvable"), el("p",null,"Ton compte existe mais son profil n’a pas été créé. Préviens l’admin.")); c.append(logoutRow()); }); return; }
+  S.me = data; S.profiles[uid] = data;
+  listen();
+  if (data.status === "approved"){ clearInterval(S.poll); S.poll=null; await refresh(); showCalendar(); }
+  else if (data.status === "refused"){ gate(refusedCard); }
+  else { gate(pendingCard); if (!S.poll) S.poll = setInterval(checkStatus, 20000); }
+}
+async function checkStatus(){
+  if (!S.session) return;
+  const { data } = await S.sb.from("profiles").select("status").eq("id", S.session.user.id).maybeSingle();
+  if (data && S.me && data.status !== S.me.status) loadMe();
+}
+
+/* Live updates: any change to slots or profiles triggers a refetch */
+let refreshTimer = null;
+function scheduleRefresh(){ clearTimeout(refreshTimer); refreshTimer = setTimeout(async ()=>{
+  if (!S.me) return;
+  const before = S.me.status;
+  const { data } = await S.sb.from("profiles").select("*").eq("id", S.me.id).maybeSingle();
+  if (data && data.status !== before){ loadMe(); return; }
+  if (data) S.me = data;
+  if (S.me.status === "approved"){ await refresh(); showCalendar(); }
+}, 250); }
+function listen(){
+  if (S.chan) return;
+  S.chan = S.sb.channel("redhouse")
+    .on("postgres_changes", { event:"*", schema:"public", table:"slots" }, scheduleRefresh)
+    .on("postgres_changes", { event:"*", schema:"public", table:"profiles" }, scheduleRefresh)
+    .subscribe();
+}
+document.addEventListener("visibilitychange", ()=>{ if (!document.hidden && S.me) scheduleRefresh(); });
+
+function rangeBounds(){
+  const ds = days(); return { from: addDays(ds[0], -1), to: addDays(ds[ds.length-1], 2) };
+}
+async function refresh(){
+  const { from, to } = rangeBounds();
+  const [p, s] = await Promise.all([
+    S.sb.from("profiles").select("id,display_name,color,status,is_admin,note,created_at"),
+    S.sb.from("slots").select("id,user_id,starts_at,ends_at,motif").lt("starts_at", to.toISOString()).gt("ends_at", from.toISOString()).order("starts_at")
+  ]);
+  if (!p.error){ const m={}; p.data.forEach(r=>m[r.id]=r); S.profiles=m; if (m[S.me.id]) S.me = {...S.me, ...m[S.me.id]}; }
+  if (!s.error){ S.slots = s.data.map(r=>({ id:r.id, uid:r.user_id, start:Date.parse(r.starts_at), end:Date.parse(r.ends_at), motif:r.motif })); }
+  if (S.me.is_admin){
+    const u = await S.sb.rpc("admin_users"); if (!u.error) S.admin.users = u.data;
+    renderAdminIfOpen();
+  }
+  if (p.error || s.error) toast(dbErr(p.error || s.error));
+}
+
+/* ---------- Auth screens ---------- */
+function logoutRow(){ const r=el("div","row"); const b=el("button","btn plain","Se déconnecter"); b.onclick=()=>S.sb.auth.signOut(); r.append(b); return r; }
+
+function loginCard(c){
+  c.append(el("h2",null,"Connexion"), el("p",null,"Réservé aux participants validés du studio."));
+  const f = el("form"); f.noValidate = true;
+  const [w1,email] = field("E-mail","email","login-email",{autocomplete:"email",required:true});
+  const [w2,pw] = field("Mot de passe","password","login-password",{autocomplete:"current-password",required:true});
+  const err = el("div","err"); const row = el("div","row"); const go = el("button","btn primary","Se connecter"); go.type="submit"; row.append(go);
+  f.append(w1,w2,row,err);
+  f.onsubmit = async e=>{ e.preventDefault(); err.textContent="";
+    if (!email.value.trim() || !pw.value){ err.textContent="Renseigne ton e-mail et ton mot de passe."; return; }
+    go.disabled=true; go.textContent="Connexion…";
+    const { error } = await S.sb.auth.signInWithPassword({ email: email.value.trim(), password: pw.value });
+    if (error){ err.textContent = authErr(error); go.disabled=false; go.textContent="Se connecter"; } };
+  const sw = el("div","switch"); const a=el("button","link","Créer un compte"); a.type="button"; a.onclick=()=>gate(signupCard);
+  const b=el("button","link","Mot de passe oublié"); b.type="button"; b.onclick=()=>gate(c2=>forgotCard(c2, email.value.trim()));
+  sw.append(a,b); c.append(f, sw);
+}
+function signupCard(c){
+  c.append(el("h2",null,"Créer un compte"), el("p",null,"Après inscription, l’admin valide ton accès avant que tu puisses voir et réserver le studio."));
+  const f = el("form"); f.noValidate = true;
+  const [w0,name] = field("Nom affiché","text","su-name",{autocomplete:"name",maxLength:60,placeholder:"Ex. : Freaky Joe"});
+  const [w1,email] = field("E-mail","email","su-email",{autocomplete:"email"});
+  const [w2,pw] = field("Mot de passe (8 caractères minimum)","password","su-password",{autocomplete:"new-password",minLength:8});
+  const [w3,pw2] = field("Confirme le mot de passe","password","su-password2",{autocomplete:"new-password"});
+  const cl = el("label","l","Ta couleur préférée"); const pick = swatchPicker(PALETTE[0]);
+  const [w4,note] = field("Message pour l’admin (facultatif)","textarea","su-note",{maxLength:300,placeholder:"Ex. : session mix pour l’EP, besoin du studio le soir"});
+  const err = el("div","err"); const row = el("div","row"); const go = el("button","btn primary","Créer mon compte"); go.type="submit"; row.append(go);
+  f.append(w0,w1,w2,w3,cl,pick.node,w4,row,err);
+  f.onsubmit = async e=>{ e.preventDefault(); err.textContent="";
+    if (!name.value.trim()) { err.textContent="Indique un nom affiché."; name.focus(); return; }
+    if (!/^\S+@\S+\.\S+$/.test(email.value.trim())) { err.textContent="Adresse e-mail invalide."; email.focus(); return; }
+    if (pw.value.length < 8) { err.textContent="Mot de passe trop court : 8 caractères minimum."; pw.focus(); return; }
+    if (pw.value !== pw2.value) { err.textContent="Les deux mots de passe ne correspondent pas."; pw2.focus(); return; }
+    go.disabled=true; go.textContent="Création…";
+    const { data, error } = await S.sb.auth.signUp({ email: email.value.trim(), password: pw.value,
+      options:{ emailRedirectTo: pageUrl, data:{ display_name: name.value.trim().slice(0,60), color: pick.value, note: note.value.trim().slice(0,300) } } });
+    if (error){ err.textContent = authErr(error); go.disabled=false; go.textContent="Créer mon compte"; return; }
+    if (data && data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0){
+      err.textContent = "Un compte existe déjà avec cette adresse. Connecte-toi."; go.disabled=false; go.textContent="Créer mon compte"; return; }
+    if (!data.session) gate(c2=>{ c2.append(el("h2",null,"Vérifie ta boîte mail"), el("p",null,"Un lien de confirmation vient d’être envoyé à "+email.value.trim()+". Clique dessus, puis reviens te connecter. Pense à regarder dans les spams.")); const r=el("div","row"); const b=el("button","btn","Retour à la connexion"); b.onclick=()=>gate(loginCard); r.append(b); c2.append(r); });
+  };
+  const sw = el("div","switch"); const a=el("button","link","J’ai déjà un compte"); a.type="button"; a.onclick=()=>gate(loginCard); sw.append(a);
+  c.append(f, sw);
+}
+function forgotCard(c, prefill){
+  c.append(el("h2",null,"Mot de passe oublié"), el("p",null,"Tu vas recevoir un lien pour choisir un nouveau mot de passe."));
+  const f = el("form"); f.noValidate = true;
+  const [w1,email] = field("E-mail","email","fg-email",{autocomplete:"email",value:prefill||""});
+  const msg = el("div","err"); const row = el("div","row"); const go = el("button","btn primary","Envoyer le lien"); go.type="submit"; row.append(go);
+  f.append(w1,row,msg);
+  f.onsubmit = async e=>{ e.preventDefault(); msg.className="err"; msg.textContent="";
+    if (!/^\S+@\S+\.\S+$/.test(email.value.trim())) { msg.textContent="Adresse e-mail invalide."; return; }
+    go.disabled=true;
+    const { error } = await S.sb.auth.resetPasswordForEmail(email.value.trim(), { redirectTo: pageUrl });
+    go.disabled=false;
+    if (error){ msg.textContent = authErr(error); return; }
+    msg.className="ok"; msg.textContent="Si un compte existe avec cette adresse, le lien est parti. Regarde aussi dans les spams."; };
+  const sw = el("div","switch"); const a=el("button","link","Retour à la connexion"); a.type="button"; a.onclick=()=>gate(loginCard); sw.append(a);
+  c.append(f, sw);
+}
+function newPasswordCard(c){
+  c.append(el("h2",null,"Nouveau mot de passe"), el("p",null,"Choisis ton nouveau mot de passe."));
+  const f = el("form"); f.noValidate = true;
+  const [w1,pw] = field("Mot de passe (8 caractères minimum)","password","np-password",{autocomplete:"new-password"});
+  const [w2,pw2] = field("Confirme le mot de passe","password","np-password2",{autocomplete:"new-password"});
+  const err = el("div","err"); const row = el("div","row"); const go = el("button","btn primary","Enregistrer"); go.type="submit"; row.append(go);
+  f.append(w1,w2,row,err);
+  f.onsubmit = async e=>{ e.preventDefault(); err.textContent="";
+    if (pw.value.length < 8) { err.textContent="8 caractères minimum."; return; }
+    if (pw.value !== pw2.value) { err.textContent="Les deux mots de passe ne correspondent pas."; return; }
+    go.disabled=true;
+    const { error } = await S.sb.auth.updateUser({ password: pw.value });
+    if (error){ err.textContent = authErr(error); go.disabled=false; return; }
+    S.recovery = false; history.replaceState(null, "", pageUrl); toast("Mot de passe modifié");
+    const { data } = await S.sb.auth.getSession(); S.session = data.session; if (S.session) loadMe(); else gate(loginCard); };
+  c.append(f);
+}
+function pendingCard(c){
+  c.append(el("h2",null,"Demande en attente"), el("p",null,"L’admin doit valider ton accès. Cette page s’ouvrira toute seule dès que c’est fait."));
+  const p = el("div","muted"); p.style.cssText="display:flex;align-items:center;gap:8px";
+  const d = el("span","dot"); d.style.background=S.me.color; d.style.color=S.me.color;
+  p.append(d, el("span",null, S.me.display_name + " · " + (S.session.user.email||""))); c.append(p, logoutRow());
+}
+function refusedCard(c){
+  c.append(el("h2",null,"Accès non validé"), el("p",null,"L’admin n’a pas validé ton accès au planning, ou l’a retiré. Contacte-le directement si c’est une erreur."));
+  c.append(logoutRow());
+}
+function swatchPicker(initial, takenBy){
+  const box = el("div","swatches"); box.setAttribute("role","radiogroup"); let val = initial;
+  PALETTE.forEach(c=>{
+    const b = el("button","sw"); b.type="button"; b.style.setProperty("--c",c); b.setAttribute("role","radio");
+    b.setAttribute("aria-label","Couleur "+c); b.setAttribute("aria-checked", String(c===val));
+    if (takenBy && takenBy(c)) b.classList.add("taken");
+    b.onclick=()=>{ val=c; box.querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-checked",String(x===b))); };
+    box.appendChild(b);
+  });
+  return { node:box, get value(){ return val; } };
+}
+const usedColors = except => new Set(Object.values(S.profiles).filter(p=>p.status==="approved" && p.id!==except).map(p=>p.color));
+const firstFree = () => PALETTE.find(c=>!usedColors().has(c)) || PALETTE[0];
+
+/* ---------- Calendar ---------- */
+function visibleSlots(){ return S.slots.filter(s=>S.profiles[s.uid] && S.profiles[s.uid].status==="approved"); }
+function days(){ if (S.view==="day") return [S.anchor]; const m = mondayOf(S.anchor); return [0,1,2,3,4,5,6].map(i=>addDays(m,i)); }
+function showCalendar(){
+  $("gate").hidden=true; $("booth").hidden=false; $("ctrls").hidden=false;
+  $("mename").textContent = S.me.display_name || "Moi";
+  $("medot").style.background = S.me.color; $("medot").style.color = S.me.color;
+  $("admin").hidden = !S.me.is_admin;
+  const pending = Object.values(S.profiles).filter(p=>p.status==="pending").length;
+  $("pend").hidden = !pending; $("pend").textContent = pending;
+  $("v-day").setAttribute("aria-pressed", String(S.view==="day"));
+  $("v-week").setAttribute("aria-pressed", String(S.view==="week"));
+  renderLegend(); renderGrid();
+}
+function renderLegend(){
+  const lg = $("legend"); lg.replaceChildren();
+  Object.values(S.profiles).filter(p=>p.status==="approved")
+    .sort((a,b)=> a.id===S.me.id ? -1 : b.id===S.me.id ? 1 : a.display_name.localeCompare(b.display_name))
+    .forEach(p=>{ const s = el("span", p.id===S.me.id?"you":null); const d = el("span","dot"); d.style.background=p.color; d.style.color=p.color;
+      s.append(d, el("span",null, p.display_name + (p.id===S.me.id?" (moi)":""))); lg.appendChild(s); });
+  lg.appendChild(el("span","tip","Glisser pour déplacer · bord bas pour la durée · ⌥ Option + clic pour copier"));
+}
+function endDrag(){ S.dragging=false; document.body.classList.remove("dragging","resizing","copying"); if (S.pendingRender){ S.pendingRender=false; renderGrid(); } }
+
+function renderGrid(){
+  if (S.dragging){ S.pendingRender = true; return; }
+  const ds = days(); const today = dayKey(new Date());
+  $("cal").style.setProperty("--days", ds.length);
+  const first = ds[0], last = ds[ds.length-1];
+  $("range").textContent = S.view==="day" ? fmtLong.format(first) : fmtRange.format(first)+" → "+fmtRange.format(last)+" "+last.getFullYear();
+  const head = $("calhead"); head.replaceChildren(el("div"));
+  ds.forEach(d=>{ const h = el("div","dh"+(dayKey(d)===today?" today":"")); h.append(el("div","dn",fmtDay.format(d).replace(".","")), el("div","dd",String(d.getDate()))); head.appendChild(h); });
+  const body = $("calbody"); body.replaceChildren();
+  const gut = el("div","gut"); for (let h=0;h<24;h++) gut.appendChild(el("div",null,pad(h)+":00")); body.appendChild(gut);
+  const slots = visibleSlots(); const hpx = H();
+  ds.forEach(d=>{
+    const col = el("div","col"+(dayKey(d)===today?" today":"")); col.dataset.day = d.getTime();
+    const d0 = d.getTime(), d1 = addDays(d,1).getTime();
+    slots.filter(s=>s.start<d1 && s.end>d0).forEach(s=>{
+      const a = Math.max(s.start,d0), b = Math.min(s.end,d1);
+      const top = (a-d0)/3600000*hpx, hgt = Math.max((b-a)/3600000*hpx, 18);
+      const mine = s.uid===S.me.id;
+      const ev = el("button","ev"+(mine?" mine":"")); ev.type="button";
+      ev.style.setProperty("--c", colorOf(s.uid)); ev.style.top=top+"px"; ev.style.height=(hgt-2)+"px";
+      ev.append(el("div","t",hm(new Date(s.start))+"–"+hm(new Date(s.end))));
+      if (s.motif) ev.append(el("div","m",s.motif));
+      if (hgt>54 || !mine) ev.append(el("div","o",nameOf(s.uid)));
+      ev.setAttribute("aria-label", nameOf(s.uid)+", "+hm(new Date(s.start))+" à "+hm(new Date(s.end))+", "+s.motif);
+      ev.addEventListener("pointerdown", e=>{
+        e.stopPropagation();
+        if (e.pointerType!=="mouse" || e.button!==0) return;
+        if (e.altKey){ e.preventDefault(); startDrag(e, ev, s, "copy"); }
+        else if (mine){ e.preventDefault(); const r = ev.getBoundingClientRect(); startDrag(e, ev, s, (r.bottom - e.clientY) <= 8 ? "resize" : "move"); }
+      });
+      ev.onclick = e=>{ if (ev.dataset.dragged){ delete ev.dataset.dragged; return; } if (e.altKey) return duplicate(s); openSlot(s); };
+      col.appendChild(ev);
+    });
+    if (dayKey(d)===today){ const n=new Date(); const line=el("div","now"); line.style.top=((n-d0)/3600000*hpx)+"px"; col.appendChild(line); }
+    bindCreate(col, d);
+    body.appendChild(col);
+  });
+  if (!S.scrolled){ S.scrolled=true; const n=new Date(); $("cal").scrollTop = Math.max(0,(Math.min(n.getHours(),20)-1))*hpx; }
+}
+function overlaps(start, end, ignoreId){ return visibleSlots().find(s=>s.id!==ignoreId && s.start<end && s.end>start); }
+
+function bindCreate(col, day){
+  let drag=null;
+  const minAt = y => { const r = col.getBoundingClientRect(); const mins = Math.max(0,Math.min(1440,(y-r.top)/H()*60)); return Math.round(mins/SNAP)*SNAP; };
+  col.addEventListener("pointerdown", e=>{
+    if (e.button!==0) return;
+    if (e.pointerType!=="mouse"){
+      const t0=Date.now(), y0=e.clientY;
+      const up = ev=>{ col.removeEventListener("pointerup",up); if (Date.now()-t0<350 && Math.abs(ev.clientY-y0)<8){ const s=Math.floor(minAt(y0)/30)*30; openForm({start:+day+s*60000, end:+day+Math.min(1440,s+60)*60000}); } };
+      col.addEventListener("pointerup",up); return;
+    }
+    e.preventDefault(); col.setPointerCapture(e.pointerId);
+    const a = Math.min(minAt(e.clientY), 1440-SNAP);
+    drag = {a, b:a+60, node: el("div","draft")}; S.dragging = true;
+    drag.node.style.setProperty("--c", S.me.color); col.appendChild(drag.node); paint();
+  });
+  col.addEventListener("pointermove", e=>{ if(!drag) return; let b=minAt(e.clientY); if (b===drag.a) b=drag.a+SNAP; drag.b=b; paint(); });
+  col.addEventListener("pointerup", ()=>{ if(!drag) return; const lo=Math.min(drag.a,drag.b), hi=Math.max(drag.a,drag.b); drag.node.remove(); drag=null; endDrag();
+    openForm({start:+day+lo*60000, end:+day+hi*60000}); });
+  col.addEventListener("pointercancel", ()=>{ if(drag){ drag.node.remove(); drag=null; endDrag(); } });
+  function paint(){ const lo=Math.min(drag.a,drag.b), hi=Math.max(drag.a,drag.b), h=H();
+    drag.node.style.top=(lo/60*h)+"px"; drag.node.style.height=((hi-lo)/60*h-2)+"px";
+    const bad = overlaps(+day+lo*60000, +day+hi*60000); drag.node.classList.toggle("bad", !!bad);
+    drag.node.textContent = pad(Math.floor(lo/60))+":"+pad(lo%60)+"–"+(hi===1440?"24:00":pad(Math.floor(hi/60))+":"+pad(hi%60)) + (bad?" · occupé":""); }
+}
+
+/* Drag an own slot to move it, drag its bottom edge to resize, or hold Option to drag out a copy */
+function startDrag(e, ev, s, mode){
+  const x0 = e.clientX, y0 = e.clientY, dur = s.end - s.start, origDay0 = +startOfDay(new Date(s.start));
+  let active=false, draft=null; const cur={start:s.start, end:s.end};
+  const ignore = mode==="copy" ? null : s.id;
+  const onMove = m=>{
+    if (!active){
+      if (Math.hypot(m.clientX-x0, m.clientY-y0) < 4) return;
+      active=true; S.dragging=true;
+      if (mode!=="copy") ev.style.opacity=".35";
+      document.body.classList.add(mode==="resize"?"resizing":mode==="copy"?"copying":"dragging");
+      draft = el("div","draft"); draft.style.setProperty("--c", S.me.color);
+    }
+    const dmin = Math.round((m.clientY-y0)/H()*60/SNAP)*SNAP;
+    let col = ev.parentElement;
+    if (mode==="resize"){
+      cur.start = s.start;
+      cur.end = Math.min(Math.max(s.start + SNAP*60000, s.end + dmin*60000), origDay0 + 86400000);
+    } else {
+      const hit = document.elementsFromPoint(m.clientX, m.clientY).find(x=>x.classList && x.classList.contains("col"));
+      if (hit) col = hit; else if (draft.parentElement) col = draft.parentElement;
+      const day0 = +col.dataset.day;
+      let st = day0 + (s.start - origDay0) + dmin*60000;
+      st = Math.max(day0, Math.min(st, day0 + 86400000 - Math.min(dur, 86400000)));
+      cur.start = st; cur.end = st + dur;
+    }
+    if (draft.parentElement !== col) col.appendChild(draft);
+    const h = H(), d0 = +col.dataset.day;
+    draft.style.top = ((cur.start-d0)/3600000*h)+"px";
+    draft.style.height = ((cur.end-cur.start)/3600000*h-2)+"px";
+    const bad = overlaps(cur.start, cur.end, ignore);
+    draft.classList.toggle("bad", !!bad);
+    const endTxt = (cur.end - d0 >= 86400000) ? "24:00" : hm(new Date(cur.end));
+    draft.textContent = (mode==="copy"?"Copie · ":"") + hm(new Date(cur.start))+"–"+endTxt+(bad?" · occupé":"");
+  };
+  const onUp = async ()=>{
+    window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); window.removeEventListener("pointercancel", onUp);
+    if (!active) return;
+    ev.dataset.dragged = "1"; setTimeout(()=>{ delete ev.dataset.dragged; }, 0);
+    if (draft) draft.remove(); ev.style.opacity="";
+    const changed = cur.start!==s.start || cur.end!==s.end;
+    const conflict = overlaps(cur.start, cur.end, ignore);
+    endDrag();
+    if (!changed && mode!=="copy") return;
+    if (conflict){ toast("Occupé par "+nameOf(conflict.uid)+" : rien n’a été modifié"); renderGrid(); return; }
+    if (mode==="copy"){
+      const { error } = await S.sb.from("slots").insert({ starts_at:new Date(cur.start).toISOString(), ends_at:new Date(cur.end).toISOString(), motif:s.motif });
+      if (error){ toast(dbErr(error)); return; }
+      toast("Créneau copié"); await refresh(); renderGrid(); return;
+    }
+    const local = S.slots.find(x=>x.id===s.id); if (local){ local.start=cur.start; local.end=cur.end; renderGrid(); }
+    const { error } = await S.sb.from("slots").update({ starts_at:new Date(cur.start).toISOString(), ends_at:new Date(cur.end).toISOString() }).eq("id", s.id);
+    if (error){ toast(dbErr(error)); await refresh(); renderGrid(); return; }
+    toast(mode==="resize" ? "Durée modifiée" : "Créneau déplacé");
+  };
+  window.addEventListener("pointermove", onMove); window.addEventListener("pointerup", onUp); window.addEventListener("pointercancel", onUp);
+}
+
+/* Option+click without dragging: open a copy placed right after the original */
+function duplicate(s){
+  const dur = s.end - s.start;
+  openForm({ start: s.end, end: s.end + dur, motif: s.motif }, true);
+}
+
+/* ---------- Slot dialogs ---------- */
+function closeLayer(){ adminOpen=false; $("layer").replaceChildren(); }
+function openSlot(s){
+  if (s.uid===S.me.id) return openForm(s);
+  const scrim = el("div","scrim"); scrim.onclick = e=>{ if(e.target===scrim) closeLayer(); };
+  const c = el("div","card"); c.setAttribute("role","dialog"); c.setAttribute("aria-modal","true");
+  const who = el("div","muted"); who.style.cssText="display:flex;align-items:center;gap:8px;margin-bottom:12px";
+  const d = el("span","dot"); d.style.background=colorOf(s.uid); d.style.color=colorOf(s.uid); who.append(d, el("span",null,nameOf(s.uid)));
+  c.append(el("h2",null,s.motif || "Créneau réservé"), who,
+    el("p",null, fmtLong.format(new Date(s.start))+" · "+hm(new Date(s.start))+" – "+hm(new Date(s.end))),
+    el("p","small muted","Seul·e "+nameOf(s.uid)+" peut modifier ou supprimer ce créneau. Tu peux en faire une copie à ton nom."));
+  const row=el("div","row"); const cp=el("button","btn","Copier à mon nom"); cp.onclick=()=>duplicate(s);
+  const ok=el("button","btn primary","Fermer"); ok.onclick=closeLayer; row.append(cp,ok); c.append(row);
+  scrim.append(c); $("layer").replaceChildren(scrim); ok.focus();
+}
+function openForm(s, isCopy){
+  const editing = !!s.id && !isCopy;
+  const scrim = el("div","scrim"); scrim.onclick = e=>{ if(e.target===scrim) closeLayer(); };
+  const c = el("div","card"); c.setAttribute("role","dialog"); c.setAttribute("aria-modal","true");
+  c.append(el("h2",null, editing ? "Modifier mon créneau" : isCopy ? "Copier le créneau" : "Nouveau créneau"));
+  const st = new Date(s.start), en = new Date(s.end);
+  const [wm, motif] = field("Motif","text","f-motif",{maxLength:80,placeholder:"Ex. : mix, prise voix, répétition live",value:s.motif||""});
+  c.append(wm);
+  const times = el("div","times");
+  const [wd, fd] = field("Jour","date","f-date",{value:dayKey(st)});
+  const [ws, fs] = field("Début","time","f-start",{step:900,value:hm(st)});
+  const [we, fe] = field("Fin","time","f-end",{step:900,value:(en - startOfDay(st) >= 86400000) ? "00:00" : hm(en)});
+  times.append(wd, ws, we); c.append(times);
+  const hint = el("p","muted small","Fin à 00:00 = jusqu’à minuit."); hint.style.margin="6px 0 0"; c.append(hint);
+  const err = el("div","err"); const row = el("div","row");
+  const cancel = el("button","btn plain","Annuler"); cancel.type="button"; cancel.onclick = closeLayer; row.append(cancel);
+  if (editing){
+    const dup = el("button","btn","Dupliquer"); dup.type="button"; dup.onclick=()=>duplicate(s); row.append(dup);
+    const del = el("button","btn danger","Supprimer"); del.type="button"; let armed=false;
+    del.onclick = async ()=>{
+      if (!armed){ armed=true; del.textContent="Confirmer"; return; }
+      del.disabled=true;
+      const { error } = await S.sb.from("slots").delete().eq("id", s.id);
+      if (error){ del.disabled=false; err.textContent=dbErr(error); return; }
+      closeLayer(); toast("Créneau supprimé"); await refresh(); renderGrid();
+    };
+    row.append(del);
+  }
+  const save = el("button","btn primary", editing ? "Enregistrer" : "Réserver"); save.type="button"; row.append(save);
+  c.append(err,row);
+  save.onclick = async ()=>{
+    err.textContent="";
+    const day = new Date(fd.value+"T00:00");
+    if (isNaN(day)) { err.textContent="Choisis un jour."; return; }
+    const [sh,sm] = fs.value.split(":").map(Number), [eh,em] = fe.value.split(":").map(Number);
+    if ([sh,sm,eh,em].some(isNaN)) { err.textContent="Indique une heure de début et de fin."; return; }
+    const start = new Date(day); start.setHours(sh,sm,0,0);
+    let end = new Date(day); if (eh===0 && em===0) end = addDays(day,1); else end.setHours(eh,em,0,0);
+    if (end <= start) { err.textContent="La fin doit être après le début."; return; }
+    if (!motif.value.trim()) { err.textContent="Ajoute un motif pour ce créneau."; motif.focus(); return; }
+    const conflict = overlaps(+start, +end, editing ? s.id : null);
+    if (conflict) { err.textContent = "Ce créneau chevauche celui de "+nameOf(conflict.uid)+" ("+hm(new Date(conflict.start))+"–"+hm(new Date(conflict.end))+")."; return; }
+    save.disabled = true;
+    const row2 = { starts_at:start.toISOString(), ends_at:end.toISOString(), motif:motif.value.trim().slice(0,80) };
+    const { error } = editing ? await S.sb.from("slots").update(row2).eq("id", s.id) : await S.sb.from("slots").insert(row2);
+    if (error){ save.disabled=false; err.textContent = dbErr(error); return; }
+    closeLayer(); toast(editing ? "Créneau modifié" : isCopy ? "Créneau copié" : "Créneau réservé");
+    S.anchor = S.view==="day" ? startOfDay(start) : S.anchor;
+    if (S.view==="week" && (start < mondayOf(S.anchor) || start >= addDays(mondayOf(S.anchor),7))) S.anchor = startOfDay(start);
+    await refresh(); renderGrid();
+  };
+  c.addEventListener("keydown", e=>{ if (e.key==="Enter" && e.target.tagName==="INPUT"){ e.preventDefault(); save.click(); } });
+  scrim.append(c); $("layer").replaceChildren(scrim); motif.focus();
+}
+
+/* ---------- Admin ---------- */
+let adminOpen=false;
+function renderAdminIfOpen(){ if (adminOpen) renderAdmin(); }
+const emailOf = id => { const u = S.admin.users.find(x=>x.id===id); return u ? u.email : ""; };
+async function setProfile(id, patch, okMsg){
+  const { error } = await S.sb.from("profiles").update(patch).eq("id", id);
+  if (error){ toast(dbErr(error)); return; }
+  toast(okMsg); await refresh(); showCalendar(); renderAdminIfOpen();
+}
+function renderAdmin(){
+  adminOpen=true;
+  const scrim = el("div","scrim"); scrim.onclick=closeLayer;
+  const dr = el("aside","drawer"); dr.setAttribute("aria-label","Participants");
+  const top = el("div"); top.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:8px";
+  const x = el("button","btn plain","Fermer"); x.onclick=closeLayer; top.append(el("h2",null,"Participants"), x); dr.append(top);
+  const intro = el("p","muted small","Envoie le lien de cette page aux personnes à inscrire. Chaque inscription arrive ici et reste bloquée tant que tu ne l’as pas validée."); intro.style.margin="0"; dr.append(intro);
+
+  const all = Object.values(S.profiles).filter(p=>p.id!==S.me.id);
+  dr.append(el("h3",null,"Demandes en attente"));
+  const pend = all.filter(p=>p.status==="pending").sort((a,b)=>a.created_at.localeCompare(b.created_at));
+  if (!pend.length) dr.append(el("div","empty","Aucune demande pour l’instant."));
+  pend.forEach(p=>{
+    const card = personCard(p); if (p.note) card.append(el("div","note","« "+p.note+" »"));
+    const used = usedColors(p.id); const pick = swatchPicker(used.has(p.color)?firstFree():p.color, c=>used.has(c)); card.append(pick.node);
+    const acts = el("div","acts"); const ok = el("button","btn primary","Valider"); const no = el("button","btn danger","Refuser");
+    ok.onclick = ()=>{ ok.disabled=true; setProfile(p.id, {status:"approved", color:pick.value}, p.display_name+" peut réserver"); };
+    let armed=false; no.onclick = ()=>{ if(!armed){armed=true;no.textContent="Confirmer le refus";return;} setProfile(p.id, {status:"refused"}, "Demande refusée"); };
+    acts.append(ok,no); card.append(acts); dr.append(card);
+  });
+
+  dr.append(el("h3",null,"Participants validés"));
+  const members = all.filter(p=>p.status==="approved").sort((a,b)=>a.display_name.localeCompare(b.display_name));
+  if (!members.length) dr.append(el("div","empty","Personne d’autre pour l’instant."));
+  members.forEach(p=>{
+    const card = personCard(p, p.color);
+    const used = usedColors(p.id); const pick = swatchPicker(p.color, c=>used.has(c)); card.append(pick.node);
+    const acts = el("div","acts"); const col = el("button","btn","Changer la couleur"); col.onclick=()=>setProfile(p.id,{color:pick.value},"Couleur mise à jour");
+    const rm = el("button","btn danger","Retirer l’accès"); let armed=false;
+    rm.onclick = ()=>{ if(!armed){armed=true;rm.textContent="Confirmer : retirer et libérer ses créneaux à venir";return;} setProfile(p.id,{status:"refused"},"Accès retiré"); };
+    acts.append(col, rm); card.append(acts); dr.append(card);
+  });
+
+  const refused = all.filter(p=>p.status==="refused");
+  if (refused.length){
+    dr.append(el("h3",null,"Refusés ou retirés"));
+    refused.forEach(p=>{ const card = personCard(p); const acts=el("div","acts"); const back=el("button","btn","Remettre en attente");
+      back.onclick=()=>setProfile(p.id,{status:"pending"},"Remis en attente"); acts.append(back); card.append(acts); dr.append(card); });
+  }
+  $("layer").replaceChildren(scrim, dr);
+}
+function personCard(p, color){
+  const card = el("div","person"); const t = el("div","top");
+  const txt = el("div"); txt.style.minWidth="0"; txt.append(el("div","n",p.display_name||"Sans nom")); const em = emailOf(p.id); if (em) txt.append(el("div","e",em));
+  t.append(txt); if (color){ const d=el("span","dot"); d.style.background=color; d.style.color=color; d.style.marginLeft="auto"; t.append(d); }
+  card.append(t); return card;
+}
+
+/* ---------- Controls ---------- */
+async function go(anchor){ S.anchor = anchor; renderGrid(); await refresh(); renderGrid(); }
+$("prev").onclick=()=>go(addDays(S.anchor, S.view==="day"?-1:-7));
+$("next").onclick=()=>go(addDays(S.anchor, S.view==="day"?1:7));
+$("today").onclick=()=>{ S.scrolled=false; go(startOfDay(new Date())); };
+$("v-day").onclick=()=>{ S.view="day"; showCalendar(); refresh().then(renderGrid); };
+$("v-week").onclick=()=>{ S.view="week"; showCalendar(); refresh().then(renderGrid); };
+$("new").onclick=()=>{ const n=new Date(); const base = S.view==="day" ? S.anchor : startOfDay(n);
+  const st = new Date(base); st.setHours(Math.min(n.getHours()+1,22),0,0,0); openForm({start:+st, end:+st+3600000}); };
+$("admin").onclick=()=>{ renderAdmin(); refresh(); };
+$("logout").onclick=()=>S.sb.auth.signOut();
+document.addEventListener("keydown", e=>{ if (e.key==="Escape") closeLayer(); if (e.key==="Alt") document.body.classList.add("alt"); });
+document.addEventListener("keyup", e=>{ if (e.key==="Alt") document.body.classList.remove("alt"); });
+window.addEventListener("blur", ()=>document.body.classList.remove("alt"));
+setInterval(()=>{ if (!$("booth").hidden && !S.dragging) renderGrid(); }, 60000);
+
+boot();
+})();
+</script>
+</body>
+</html>
