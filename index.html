@@ -310,7 +310,7 @@ function loginCard(c){
   sw.append(a,b); c.append(f, sw);
 }
 function signupCard(c){
-  c.append(el("h2",null,"Créer un compte"), el("p",null,"Après inscription, l’admin valide ton accès avant que tu puisses voir et réserver le studio."));
+  c.append(el("h2",null,"Créer un compte"), el("p",null,"Confirme ton adresse e-mail et tu pourras réserver le studio tout de suite."));
   const f = el("form"); f.noValidate = true;
   const [w0,name] = field("Nom affiché","text","su-name",{autocomplete:"name",maxLength:60,placeholder:"Ex. : La Madone"});
   const [w1,email] = field("E-mail","email","su-email",{autocomplete:"email"});
@@ -632,7 +632,7 @@ function renderAdmin(){
   const dr = el("aside","drawer"); dr.setAttribute("aria-label","Participants");
   const top = el("div"); top.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:8px";
   const x = el("button","btn plain","Fermer"); x.onclick=closeLayer; top.append(el("h2",null,"Participants"), x); dr.append(top);
-  const intro = el("p","muted small","Envoie le lien de cette page aux personnes à inscrire. Chaque inscription arrive ici et reste bloquée tant que tu ne l’as pas validée."); intro.style.margin="0"; dr.append(intro);
+  const intro = el("p","muted small","Envoie le lien de cette page aux personnes à inscrire. Chaque inscrit peut réserver tout de suite. Tu peux retirer un accès à tout moment ici."); intro.style.margin="0"; dr.append(intro);
 
   const all = Object.values(S.profiles).filter(p=>p.id!==S.me.id);
   dr.append(el("h3",null,"Demandes en attente"));
