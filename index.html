@@ -312,7 +312,7 @@ function loginCard(c){
 function signupCard(c){
   c.append(el("h2",null,"Créer un compte"), el("p",null,"Après inscription, l’admin valide ton accès avant que tu puisses voir et réserver le studio."));
   const f = el("form"); f.noValidate = true;
-  const [w0,name] = field("Nom affiché","text","su-name",{autocomplete:"name",maxLength:60,placeholder:"Ex. : Freaky Joe"});
+  const [w0,name] = field("Nom affiché","text","su-name",{autocomplete:"name",maxLength:60,placeholder:"Ex. : La Madone"});
   const [w1,email] = field("E-mail","email","su-email",{autocomplete:"email"});
   const [w2,pw] = field("Mot de passe (8 caractères minimum)","password","su-password",{autocomplete:"new-password",minLength:8});
   const [w3,pw2] = field("Confirme le mot de passe","password","su-password2",{autocomplete:"new-password"});
