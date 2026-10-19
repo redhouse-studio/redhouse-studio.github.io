@@ -1,0 +1,22 @@
+# Garde la base Supabase du planning active.
+# Le projet gratuit se met en pause après environ une semaine sans activité :
+# ce script l'appelle automatiquement tous les 3 jours.
+name: Garder la base active
+
+on:
+  schedule:
+    - cron: "17 7 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Appeler la base
+        run: |
+          URL=$(grep -oP 'url:\s*"\K[^"]+' config.js)
+          KEY=$(grep -oP 'anonKey:\s*"\K[^"]+' config.js)
+          curl -fsS -X POST "$URL/rest/v1/rpc/keepalive" \
+            -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
+            -H "Content-Type: application/json" -d '{}'
